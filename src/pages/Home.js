@@ -1,44 +1,60 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useRef } from "react";
 import { Link } from "react-router-dom";
-import { SpinnerCircular } from "spinners-react";
+import { ToastContainer, toast } from "react-toastify";
 import { GetContext } from "../context/GithubContext";
 const Home = () => {
   const nameRef = useRef();
-  const {} = GetContext();
 
-  const [users, setUsers] = useState([]);
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-  const fetchUsers = () => {
-    fetch(`${process.env.REACT_APP_GITHUB_URL}/users`, {
-      headers: { Authorization: `token ${process.env.REACT_APP_GITHUB_TOKEN}` },
-    })
-      .then((resp) => resp.json())
-      .then((data) => setUsers(data));
-  };
+  const { fetchUsers, users, loading, delteUsers, userInfo } = GetContext();
+
   const search = (e) => {
     e.preventDefault();
-    console.log(nameRef.current.value);
+    if (!nameRef.current.value)
+      return toast.warn("Opps ! you didn't type anything to search for", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    fetchUsers(nameRef.current.value);
+    nameRef.current.value = "";
   };
   return (
-    <div className="pb-28">
-      <form
-        className="text-center flex justify-center p-2 "
-        onSubmit={(e) => search(e)}
-      >
-        <input
-          ref={nameRef}
-          type="text"
-          placeholder="Type here"
-          className="input w-8/12  max-w-xs border-gray-600  rounded-r-none "
-        />
-        <button className="flex-grow border-gray-600 border rounded-r-md p-2 bg-neutral text-white">
-          search
-        </button>
-      </form>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-10 justify-items-center">
-        {users.length ? (
+    <div className="pb-28 ">
+      <div className="sm:flex justify-center items-center gap-2">
+        <form
+          className="text-center   flex justify-center p-2  max-w-lg mx-auto sm:mx-0"
+          onSubmit={(e) => search(e)}
+        >
+          <input
+            ref={nameRef}
+            type="text"
+            placeholder="Type here"
+            className="input w-8/12  
+            ring-2 ring-neutral  focus:outline-3 focus:outline-yellow-500 border-gray-600  rounded-r-none "
+          />
+
+          <button
+            data-tip="Search"
+            className="tooltip-top tooltip flex-grow  ring-neutral ring-2 border-gray-600 border rounded-r-md p-2 bg-neutral text-white"
+          >
+            Search
+          </button>
+        </form>
+        {users.length > 0 && (
+          <button onClick={delteUsers} className=" btn btn-active btn-ghost">
+            Clear
+          </button>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-10 justify-items-center ">
+        {loading ? (
+          <button className="btn loading absolute">loading</button>
+        ) : (
           users.map((user, i) => (
             <div
               key={i}
@@ -53,18 +69,18 @@ const Home = () => {
               <div>
                 <h1 className="text-white">{user.login}</h1>
                 <Link
-                  to={`/users/${user.login}`}
-                  className="text-xs text-slate-400 "
+                  to={`/user/${user.login}`}
+                  className="text-xs text-slate-400 link link-hover "
+                  onClick={() => userInfo(user.login)}
                 >
                   view Profile
                 </Link>
               </div>
             </div>
           ))
-        ) : (
-          <SpinnerCircular className="absolute " />
         )}
       </div>
+      <ToastContainer />
     </div>
   );
 };
