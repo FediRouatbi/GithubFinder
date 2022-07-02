@@ -63,7 +63,7 @@ const Home = () => {
             >
               <div className="avatar">
                 <div className="w-12  rounded">
-                  <img src={user.avatar_url} />
+                  <img src={user.avatar_url} alt="avatar" />
                 </div>
               </div>
               <div>
