@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer } from "react";
+import { createRenderer } from "react-dom/test-utils";
 import GithubReducer from "./GithubReducer";
 const GithubProvider = createContext();
 
@@ -8,6 +9,7 @@ const GithubContext = ({ children }) => {
     users: [],
     loading: false,
     userData: {},
+    userRepos: {},
   };
   const [state, dispatch] = useReducer(GithubReducer, intialState);
   const fetchUsers = async (searchText) => {
@@ -26,6 +28,7 @@ const GithubContext = ({ children }) => {
   };
   const userInfo = async (userName) => {
     setLoading();
+
     const resp = await fetch(
       `${process.env.REACT_APP_GITHUB_URL}/users/${userName}`,
       {
@@ -35,8 +38,18 @@ const GithubContext = ({ children }) => {
       }
     );
     const data = await resp.json();
-  
-    dispatch({ type: "SET_USER", userData: data });
+    const params = new URLSearchParams({ sort: "created", per_page: 10 });
+    const response = await fetch(
+      `${process.env.REACT_APP_GITHUB_URL}/users/${userName}/repos?${params}`,
+      {
+        headers: {
+          Authorization: `token ${process.env.REACT_APP_GITHUB_TOKEN}`,
+        },
+      }
+    );
+    const repos = await response.json();
+
+    dispatch({ type: "SET_USER", userData: data, userRepos: repos });
   };
   const delteUsers = () => {
     dispatch({ type: "DELETE_USERS" });
@@ -44,7 +57,7 @@ const GithubContext = ({ children }) => {
   const setLoading = () => {
     dispatch({ type: "SET_LOADING" });
   };
- 
+
   return (
     <GithubProvider.Provider
       value={{ fetchUsers, ...state, delteUsers, userInfo }}

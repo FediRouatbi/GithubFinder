@@ -26,7 +26,7 @@ const Home = () => {
     <div className="pb-28 ">
       <div className="sm:flex justify-center items-center gap-2">
         <form
-          className="text-center   flex justify-center p-2  max-w-lg mx-auto sm:mx-0"
+          className="text-center   flex justify-center p-2  max-w-lg mx-auto sm:mx-0 sm:w-[512px]"
           onSubmit={(e) => search(e)}
         >
           <input
@@ -39,9 +39,9 @@ const Home = () => {
 
           <button
             data-tip="Search"
-            className="tooltip-top tooltip flex-grow  ring-neutral ring-2 border-gray-600 border rounded-r-md p-2 bg-neutral text-white"
+            className="tooltip-top tooltip flex-grow  ring-neutral ring-2 border-gray-600 border rounded-r-md p-2 bg-neutral text-white font-extrabold  tracking-widest		"
           >
-            Search
+            GO
           </button>
         </form>
         {users.length > 0 && (
